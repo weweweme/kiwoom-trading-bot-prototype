@@ -40,6 +40,9 @@ namespace trading_bot_prototype
             this.lblServerType = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.cmbAccounts = new System.Windows.Forms.ComboBox();
+            this.btnCheckBalance = new System.Windows.Forms.Button();
+            this.lblBalance = new System.Windows.Forms.Label();
+            this.txtPassword = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.axKHOpenAPI1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -133,11 +136,41 @@ namespace trading_bot_prototype
             this.cmbAccounts.Size = new System.Drawing.Size(121, 20);
             this.cmbAccounts.TabIndex = 9;
             // 
+            // btnCheckBalance
+            // 
+            this.btnCheckBalance.Location = new System.Drawing.Point(22, 116);
+            this.btnCheckBalance.Name = "btnCheckBalance";
+            this.btnCheckBalance.Size = new System.Drawing.Size(121, 23);
+            this.btnCheckBalance.TabIndex = 10;
+            this.btnCheckBalance.Text = "예수금 조회";
+            this.btnCheckBalance.UseVisualStyleBackColor = true;
+            // 
+            // lblBalance
+            // 
+            this.lblBalance.AutoSize = true;
+            this.lblBalance.Location = new System.Drawing.Point(149, 93);
+            this.lblBalance.Name = "lblBalance";
+            this.lblBalance.Size = new System.Drawing.Size(45, 12);
+            this.lblBalance.TabIndex = 11;
+            this.lblBalance.Text = "예수금:";
+            // 
+            // txtPassword
+            // 
+            this.txtPassword.Location = new System.Drawing.Point(149, 116);
+            this.txtPassword.MaxLength = 8;
+            this.txtPassword.Name = "txtPassword";
+            this.txtPassword.Size = new System.Drawing.Size(100, 21);
+            this.txtPassword.TabIndex = 12;
+            this.txtPassword.UseSystemPasswordChar = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.txtPassword);
+            this.Controls.Add(this.lblBalance);
+            this.Controls.Add(this.btnCheckBalance);
             this.Controls.Add(this.cmbAccounts);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.lblServerType);
@@ -168,6 +201,9 @@ namespace trading_bot_prototype
         private System.Windows.Forms.Label lblServerType;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox cmbAccounts;
+        private System.Windows.Forms.Button btnCheckBalance;
+        private System.Windows.Forms.Label lblBalance;
+        private System.Windows.Forms.TextBox txtPassword;
     }
 }
 
