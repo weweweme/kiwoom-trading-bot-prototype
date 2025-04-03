@@ -29,8 +29,12 @@ namespace trading_bot_prototype
                     string userId = axKHOpenAPI1.GetLoginInfo("USER_ID");
                     string userName = axKHOpenAPI1.GetLoginInfo("USER_NAME");
                     string accountListRaw = axKHOpenAPI1.GetLoginInfo("ACCNO"); // 계좌번호 목록
-                    string[] accountList = accountListRaw.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     string serverType = axKHOpenAPI1.GetLoginInfo("GetServerGubun"); // 0: 실서버, 1: 모의투자
+                    string[] accountList = accountListRaw.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    cmbAccounts.Items.Clear();
+                    cmbAccounts.Items.AddRange(accountList);
+                    if (cmbAccounts.Items.Count > 0)
+                        cmbAccounts.SelectedIndex = 0;
 
                     // 출력
                     WriteLog($"사용자 ID: {userId}");
