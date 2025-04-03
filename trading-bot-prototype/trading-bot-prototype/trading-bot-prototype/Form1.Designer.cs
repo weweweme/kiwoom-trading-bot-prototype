@@ -41,6 +41,7 @@ namespace trading_bot_prototype
             this.label3 = new System.Windows.Forms.Label();
             this.cmbAccounts = new System.Windows.Forms.ComboBox();
             this.btnCheckBalance = new System.Windows.Forms.Button();
+            this.lblBalance = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.axKHOpenAPI1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -143,11 +144,21 @@ namespace trading_bot_prototype
             this.btnCheckBalance.Text = "예수금 조회";
             this.btnCheckBalance.UseVisualStyleBackColor = true;
             // 
+            // lblBalance
+            // 
+            this.lblBalance.AutoSize = true;
+            this.lblBalance.Location = new System.Drawing.Point(149, 93);
+            this.lblBalance.Name = "lblBalance";
+            this.lblBalance.Size = new System.Drawing.Size(45, 12);
+            this.lblBalance.TabIndex = 11;
+            this.lblBalance.Text = "예수금:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.lblBalance);
             this.Controls.Add(this.btnCheckBalance);
             this.Controls.Add(this.cmbAccounts);
             this.Controls.Add(this.label3);
@@ -180,6 +191,7 @@ namespace trading_bot_prototype
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox cmbAccounts;
         private System.Windows.Forms.Button btnCheckBalance;
+        private System.Windows.Forms.Label lblBalance;
     }
 }
 

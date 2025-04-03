@@ -106,8 +106,8 @@ namespace trading_bot_prototype
                     cash = cash.Trim();
                     WriteLog($"현재 매수 가능 예수금: {cash}원");
 
-                    // (선택) Label로도 표시
-                    // lblBalance.Text = $"예수금: {cash}원";
+                    // label로도 표시
+                    lblBalance.Text = $"예수금: {cash}원";
                 }
             };
         }
