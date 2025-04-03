@@ -84,9 +84,16 @@ namespace trading_bot_prototype
                 }
 
                 string account = cmbAccounts.SelectedItem.ToString();
+                string password = txtPassword.Text.Trim();
+
+                if (string.IsNullOrWhiteSpace(password))
+                {
+                    WriteLog("비밀번호를 입력하세요.");
+                    return;
+                }
 
                 axKHOpenAPI1.SetInputValue("계좌번호", account);
-                axKHOpenAPI1.SetInputValue("비밀번호", ""); // 보통 공란, 실서버에서 다르면 수정
+                axKHOpenAPI1.SetInputValue("비밀번호", password); // <- 여기!
                 axKHOpenAPI1.SetInputValue("비밀번호입력매체구분", "00"); // PC
                 axKHOpenAPI1.SetInputValue("조회구분", "1"); // 합산
 
@@ -102,12 +109,17 @@ namespace trading_bot_prototype
             {
                 if (e.sRQName == "예수금요청")
                 {
-                    string cash = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "예수금");
-                    cash = cash.Trim();
-                    WriteLog($"현재 매수 가능 예수금: {cash}원");
+                    string cashRaw = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "예수금");
+                    string cashTrimmed = cashRaw.Trim().TrimStart('0');
 
-                    // label로도 표시
-                    lblBalance.Text = $"예수금: {cash}원";
+                    if (string.IsNullOrEmpty(cashTrimmed))
+                        cashTrimmed = "0";
+
+                    long cash = long.Parse(cashTrimmed);
+                    string formattedCash = cash.ToString("N0"); // "10,000,000"
+
+                    WriteLog($"현재 매수 가능 예수금: {formattedCash}원");
+                    lblBalance.Text = $"예수금: {formattedCash}원";
                 }
             };
         }
