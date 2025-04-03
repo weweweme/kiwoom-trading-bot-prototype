@@ -22,9 +22,30 @@ namespace trading_bot_prototype
             axKHOpenAPI1.OnEventConnect += (s, e) =>
             {
                 if (e.nErrCode == 0)
-                    WriteLog("로그인 성공"); // 정상 처리
+                {
+                    WriteLog("로그인 성공");
+
+                    // 로그인 정보 가져오기
+                    string userId = axKHOpenAPI1.GetLoginInfo("USER_ID");
+                    string userName = axKHOpenAPI1.GetLoginInfo("USER_NAME");
+                    string accountListRaw = axKHOpenAPI1.GetLoginInfo("ACCNO"); // 계좌번호 목록
+                    string[] accountList = accountListRaw.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    string serverType = axKHOpenAPI1.GetLoginInfo("GetServerGubun"); // 0: 실서버, 1: 모의투자
+
+                    // 출력
+                    WriteLog($"사용자 ID: {userId}");
+                    WriteLog($"사용자 이름: {userName}");
+                    WriteLog("계좌 목록:");
+                    foreach (string acc in accountList)
+                    {
+                        WriteLog($"- {acc}");
+                    }
+                    WriteLog($"서버 종류: {(serverType == "1" ? "모의투자" : "실서버")}");
+                }
                 else
-                    WriteLog($"로그인 실패: {e.nErrCode}"); // 에러 발생
+                {
+                    WriteLog($"로그인 실패 - 에러코드: {e.nErrCode}");
+                }
             };
 
             // 로그인 버튼 클릭 이벤트 핸들러
