@@ -74,6 +74,29 @@ namespace trading_bot_prototype
                 else
                     WriteLog("Open API 연결 중입니다.");
             };
+
+            btnCheckBalance.Click += (s, e) =>
+            {
+                if (cmbAccounts.SelectedItem == null)
+                {
+                    WriteLog("계좌를 선택하세요.");
+                    return;
+                }
+
+                string account = cmbAccounts.SelectedItem.ToString();
+
+                axKHOpenAPI1.SetInputValue("계좌번호", account);
+                axKHOpenAPI1.SetInputValue("비밀번호", ""); // 보통 공란, 실서버에서 다르면 수정
+                axKHOpenAPI1.SetInputValue("비밀번호입력매체구분", "00"); // PC
+                axKHOpenAPI1.SetInputValue("조회구분", "1"); // 합산
+
+                int result = axKHOpenAPI1.CommRqData("예수금요청", "opw00001", 0, "9000");
+
+                if (result == 0)
+                    WriteLog("예수금 조회 요청 성공");
+                else
+                    WriteLog("예수금 조회 요청 실패");
+            };
         }
 
         private void WriteLog(string message)
