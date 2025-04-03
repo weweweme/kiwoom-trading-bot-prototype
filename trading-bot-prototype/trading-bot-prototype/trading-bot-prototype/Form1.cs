@@ -8,6 +8,7 @@ namespace trading_bot_prototype
         public Form1()
         {
             InitializeComponent();
+            this.Load += new EventHandler(this.Form1_Load);
         }
 
         private void Form1_Load(object sender, EventArgs e)
