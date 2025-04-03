@@ -36,6 +36,11 @@ namespace trading_bot_prototype
                     if (cmbAccounts.Items.Count > 0)
                         cmbAccounts.SelectedIndex = 0;
 
+                    // Label에 실제 값 세팅
+                    lblUserId.Text = $"ID: {userId}";
+                    lblUserName.Text = $"이름: {userName}";
+                    lblServerType.Text = $"서버: {(serverType == "1" ? "모의투자" : "실서버")}";
+
                     // 출력
                     WriteLog($"사용자 ID: {userId}");
                     WriteLog($"사용자 이름: {userName}");
@@ -76,16 +81,6 @@ namespace trading_bot_prototype
             rtxtLog.AppendText($"{DateTime.Now:HH:mm:ss} - {message}\n");
             rtxtLog.SelectionStart = rtxtLog.Text.Length;
             rtxtLog.ScrollToCaret();
-        }
-
-        private void lblUserId_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }

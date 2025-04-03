@@ -96,7 +96,6 @@ namespace trading_bot_prototype
             this.lblUserId.Size = new System.Drawing.Size(20, 12);
             this.lblUserId.TabIndex = 5;
             this.lblUserId.Text = "ID:";
-            this.lblUserId.Click += new System.EventHandler(this.lblUserId_Click);
             // 
             // lblUserName
             // 
@@ -115,7 +114,6 @@ namespace trading_bot_prototype
             this.lblServerType.Size = new System.Drawing.Size(33, 12);
             this.lblServerType.TabIndex = 7;
             this.lblServerType.Text = "서버:";
-            this.lblServerType.Click += new System.EventHandler(this.label2_Click);
             // 
             // label3
             // 
