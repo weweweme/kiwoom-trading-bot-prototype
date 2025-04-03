@@ -97,6 +97,19 @@ namespace trading_bot_prototype
                 else
                     WriteLog("예수금 조회 요청 실패");
             };
+
+            axKHOpenAPI1.OnReceiveTrData += (s, e) =>
+            {
+                if (e.sRQName == "예수금요청")
+                {
+                    string cash = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "예수금");
+                    cash = cash.Trim();
+                    WriteLog($"현재 매수 가능 예수금: {cash}원");
+
+                    // (선택) Label로도 표시
+                    // lblBalance.Text = $"예수금: {cash}원";
+                }
+            };
         }
 
         private void WriteLog(string message)
