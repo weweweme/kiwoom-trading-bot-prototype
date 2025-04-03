@@ -19,5 +19,12 @@ namespace trading_bot_prototype
         {
             // TODO: 이벤트 등록들 (로그인, 연결확인, 이벤트핸들러 등)
         }
+
+        private void WriteLog(string message)
+        {
+            rtxtLog.AppendText($"{DateTime.Now:HH:mm:ss} - {message}\n");
+            rtxtLog.SelectionStart = rtxtLog.Text.Length;
+            rtxtLog.ScrollToCaret();
+        }
     }
 }
