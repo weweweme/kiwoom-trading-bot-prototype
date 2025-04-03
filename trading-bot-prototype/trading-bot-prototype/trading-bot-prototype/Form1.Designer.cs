@@ -34,6 +34,12 @@ namespace trading_bot_prototype
             this.btnLogin = new System.Windows.Forms.Button();
             this.btnCheckConnect = new System.Windows.Forms.Button();
             this.rtxtLog = new System.Windows.Forms.RichTextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.lblUserId = new System.Windows.Forms.Label();
+            this.lblUserName = new System.Windows.Forms.Label();
+            this.lblServerType = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.cmbAccounts = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.axKHOpenAPI1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -74,11 +80,72 @@ namespace trading_bot_prototype
             this.rtxtLog.TabIndex = 3;
             this.rtxtLog.Text = "";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(20, 423);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(0, 12);
+            this.label1.TabIndex = 4;
+            // 
+            // lblUserId
+            // 
+            this.lblUserId.AutoSize = true;
+            this.lblUserId.Location = new System.Drawing.Point(20, 15);
+            this.lblUserId.Name = "lblUserId";
+            this.lblUserId.Size = new System.Drawing.Size(20, 12);
+            this.lblUserId.TabIndex = 5;
+            this.lblUserId.Text = "ID:";
+            this.lblUserId.Click += new System.EventHandler(this.lblUserId_Click);
+            // 
+            // lblUserName
+            // 
+            this.lblUserName.AutoSize = true;
+            this.lblUserName.Location = new System.Drawing.Point(20, 40);
+            this.lblUserName.Name = "lblUserName";
+            this.lblUserName.Size = new System.Drawing.Size(33, 12);
+            this.lblUserName.TabIndex = 6;
+            this.lblUserName.Text = "이름:";
+            // 
+            // lblServerType
+            // 
+            this.lblServerType.AutoSize = true;
+            this.lblServerType.Location = new System.Drawing.Point(20, 65);
+            this.lblServerType.Name = "lblServerType";
+            this.lblServerType.Size = new System.Drawing.Size(33, 12);
+            this.lblServerType.TabIndex = 7;
+            this.lblServerType.Text = "서버:";
+            this.lblServerType.Click += new System.EventHandler(this.label2_Click);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(20, 90);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(0, 12);
+            this.label3.TabIndex = 8;
+            // 
+            // cmbAccounts
+            // 
+            this.cmbAccounts.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbAccounts.FormattingEnabled = true;
+            this.cmbAccounts.Location = new System.Drawing.Point(22, 90);
+            this.cmbAccounts.MaxDropDownItems = 20;
+            this.cmbAccounts.Name = "cmbAccounts";
+            this.cmbAccounts.Size = new System.Drawing.Size(121, 20);
+            this.cmbAccounts.TabIndex = 9;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.cmbAccounts);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.lblServerType);
+            this.Controls.Add(this.lblUserName);
+            this.Controls.Add(this.lblUserId);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.rtxtLog);
             this.Controls.Add(this.btnCheckConnect);
             this.Controls.Add(this.btnLogin);
@@ -87,6 +154,7 @@ namespace trading_bot_prototype
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.axKHOpenAPI1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -96,6 +164,12 @@ namespace trading_bot_prototype
         private System.Windows.Forms.Button btnLogin;
         private System.Windows.Forms.Button btnCheckConnect;
         private System.Windows.Forms.RichTextBox rtxtLog;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblUserId;
+        private System.Windows.Forms.Label lblUserName;
+        private System.Windows.Forms.Label lblServerType;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ComboBox cmbAccounts;
     }
 }
 

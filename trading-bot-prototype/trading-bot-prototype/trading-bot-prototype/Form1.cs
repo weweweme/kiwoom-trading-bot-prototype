@@ -77,5 +77,15 @@ namespace trading_bot_prototype
             rtxtLog.SelectionStart = rtxtLog.Text.Length;
             rtxtLog.ScrollToCaret();
         }
+
+        private void lblUserId_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
