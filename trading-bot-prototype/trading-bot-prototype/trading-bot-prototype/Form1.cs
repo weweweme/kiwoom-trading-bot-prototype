@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace trading_bot_prototype
 {
     public partial class Form1 : Form
     {
+        private Dictionary<string, string> nameToCode = new Dictionary<string, string>();
+
         public Form1()
         {
             InitializeComponent();
@@ -179,6 +183,26 @@ namespace trading_bot_prototype
                 return raw;
 
             return val.ToString("N0");
+        }
+
+
+        private void LoadStockNameDictionary()
+        {
+            nameToCode.Clear();
+
+            var kospi = axKHOpenAPI1.GetCodeListByMarket("0").Split(';');
+            var kosdaq = axKHOpenAPI1.GetCodeListByMarket("10").Split(';');
+
+            foreach (var code in kospi.Concat(kosdaq))
+            {
+                if (string.IsNullOrWhiteSpace(code)) continue;
+                string name = axKHOpenAPI1.GetMasterCodeName(code).Trim();
+
+                if (!nameToCode.ContainsKey(name))
+                    nameToCode[name] = code;
+            }
+
+            WriteLog($"종목명 매핑 완료 - 총 {nameToCode.Count}건");
         }
     }
 }
