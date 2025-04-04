@@ -121,6 +121,28 @@ namespace trading_bot_prototype
                     WriteLog($"현재 매수 가능 예수금: {formattedCash}원");
                     lblBalance.Text = $"예수금: {formattedCash}원";
                 }
+
+                if (e.sRQName == "종목정보요청")
+                {
+                    string code = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "종목코드").Trim();
+                    string name = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "종목명").Trim();
+                    string open = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "시가").TrimStart('0');
+                    string high = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "고가").TrimStart('0');
+                    string low = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "저가").TrimStart('0');
+                    string upper = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "상한가").TrimStart('0');
+                    string basePrice = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "기준가").TrimStart('0');
+                    string floatRate = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "유통비율").Trim();
+
+                    WriteLog($"[종목 정보]");
+                    WriteLog($"코드: {code}");
+                    WriteLog($"이름: {name}");
+                    WriteLog($"시가: {FormatPrice(open)}");
+                    WriteLog($"고가: {FormatPrice(high)}");
+                    WriteLog($"저가: {FormatPrice(low)}");
+                    WriteLog($"상한가: {FormatPrice(upper)}");
+                    WriteLog($"기준가: {FormatPrice(basePrice)}");
+                    WriteLog($"유통비율: {floatRate}");
+                }
             };
 
             btnRequestStockInfo.Click += (s, e) =>
