@@ -149,5 +149,12 @@ namespace trading_bot_prototype
             rtxtLog.SelectionStart = rtxtLog.Text.Length;
             rtxtLog.ScrollToCaret();
         }
+
+        private string FormatPrice(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return "0";
+            if (!long.TryParse(raw, out long val)) return raw;
+            return val.ToString("N0");
+        }
     }
 }
