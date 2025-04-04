@@ -20,20 +20,16 @@ namespace trading_bot_prototype
             KiwoomApiWrapper api,
             Logger logger,
             PriceFormatter formatter,
-            ComboBox cmbAccounts,
-            Label lblUserId,
-            Label lblUserName,
-            Label lblServerType,
-            Label lblBalance)
+            AccountUIContext ui)
         {
             _api = api;
             _logger = logger;
             _formatter = formatter;
-            _cmbAccounts = cmbAccounts;
-            _lblUserId = lblUserId;
-            _lblUserName = lblUserName;
-            _lblServerType = lblServerType;
-            _lblBalance = lblBalance;
+            _cmbAccounts = ui.CmbAccounts;
+            _lblUserId = ui.LblUserId;
+            _lblUserName = ui.LblUserName;
+            _lblServerType = ui.LblServerType;
+            _lblBalance = ui.LblBalance;
         }
 
         public void HandleLoginSuccess()
