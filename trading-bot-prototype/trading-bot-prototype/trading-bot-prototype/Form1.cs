@@ -108,7 +108,7 @@ namespace trading_bot_prototype
                 axKHOpenAPI1.SetInputValue("비밀번호입력매체구분", "00"); // PC
                 axKHOpenAPI1.SetInputValue("조회구분", "1"); // 합산
 
-                int result = axKHOpenAPI1.CommRqData("예수금요청", "opw00001", 0, "9000");
+                int result = _api.RequestBalance(account, password);
 
                 if (result == 0)
                     _logger.Log("예수금 조회 요청 성공");
