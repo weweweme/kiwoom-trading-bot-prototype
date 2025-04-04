@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace trading_bot_prototype
 {
     public partial class Form1 : Form
     {
-        private readonly Dictionary<string, string> nameToCode;
+        private readonly Dictionary<string, string> nameToCode = new Dictionary<string, string>();
         private readonly Logger _logger;
         private readonly PriceFormatter _formatter;
         private readonly KiwoomApiWrapper _api;
@@ -33,8 +32,6 @@ namespace trading_bot_prototype
                     LblServerType = lblServerType,
                     LblBalance = lblBalance
                 });
-
-            nameToCode = _api.GetStockCodeNameMap();
 
             _stock = new StockService(
                 _api,
@@ -65,6 +62,8 @@ namespace trading_bot_prototype
                 {
                     _logger.Log("로그인 성공");
                     _account.HandleLoginSuccess();
+                    _api.PopulateStockCodeNameMap(nameToCode);
+                    _logger.Log($"종목명 사전 로딩 완료 - 총 {nameToCode.Count}건");
                 }
                 else
                 {

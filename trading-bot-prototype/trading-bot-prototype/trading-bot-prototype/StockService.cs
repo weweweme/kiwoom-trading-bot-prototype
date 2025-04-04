@@ -40,13 +40,13 @@ namespace trading_bot_prototype
         /// </summary>
         public void OnStockNameChanged()
         {
-            string keyword = _txtStockName.Text.Trim();
+            string keyword = _txtStockName.Text.Trim().ToLowerInvariant();
             _lstStockCandidates.Items.Clear();
 
-            if (keyword.Length < 1) return;
+            if (string.IsNullOrEmpty(keyword)) return;
 
             var filtered = _nameToCode
-                .Where(kv => kv.Key.Contains(keyword))
+                .Where(kv => kv.Key.ToLowerInvariant().Contains(keyword))
                 .OrderBy(kv => kv.Key)
                 .Select(kv => $"{kv.Key} ({kv.Value})")
                 .ToList();
