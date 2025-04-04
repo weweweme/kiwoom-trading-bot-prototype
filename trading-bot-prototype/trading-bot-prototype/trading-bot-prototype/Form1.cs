@@ -54,6 +54,8 @@ namespace trading_bot_prototype
                         WriteLog($"- {acc}");
                     }
                     WriteLog($"서버 종류: {(serverType == "1" ? "모의투자" : "실서버")}");
+
+                    LoadStockNameDictionary();
                 }
                 else
                 {
