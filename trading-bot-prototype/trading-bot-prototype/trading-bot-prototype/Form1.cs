@@ -7,14 +7,16 @@ namespace trading_bot_prototype
 {
     public partial class Form1 : Form
     {
-        private Dictionary<string, string> nameToCode = new Dictionary<string, string>();
-        private Logger _logger;
+        private readonly Dictionary<string, string> nameToCode = new Dictionary<string, string>();
+        private readonly Logger _logger;
+        private readonly PriceFormatter _formatter;
 
         public Form1()
         {
             InitializeComponent();
             this.Load += new EventHandler(this.Form1_Load);
             _logger = new Logger(rtxtLog);
+            _formatter = new PriceFormatter();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -118,7 +120,7 @@ namespace trading_bot_prototype
                 if (e.sRQName == "예수금요청")
                 {
                     string cashRaw = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "예수금");
-                    string cashFormatted = FormatPrice(cashRaw);
+                    string cashFormatted = _formatter.Format(cashRaw);
 
                     _logger.Log($"현재 매수 가능 예수금: {cashFormatted}원");
                     lblBalance.Text = $"예수금: {cashFormatted}원";
@@ -138,11 +140,11 @@ namespace trading_bot_prototype
                     _logger.Log($"[종목 정보]");
                     _logger.Log($"코드: {code}");
                     _logger.Log($"이름: {name}");
-                    _logger.Log($"시가: {FormatPrice(open)}");
-                    _logger.Log($"고가: {FormatPrice(high)}");
-                    _logger.Log($"저가: {FormatPrice(low)}");
-                    _logger.Log($"상한가: {FormatPrice(upper)}");
-                    _logger.Log($"기준가: {FormatPrice(basePrice)}");
+                    _logger.Log($"시가: {_formatter.Format(open)}");
+                    _logger.Log($"고가: {_formatter.Format(high)}");
+                    _logger.Log($"저가: {_formatter.Format(low)}");
+                    _logger.Log($"상한가: {_formatter.Format(upper)}");
+                    _logger.Log($"기준가: {_formatter.Format(basePrice)}");
                     _logger.Log($"유통비율: {floatRate}");
                 }
             };
@@ -192,22 +194,6 @@ namespace trading_bot_prototype
                 txtStockCode.Text = code;
             };
         }
-
-        private string FormatPrice(string raw)
-        {
-            if (string.IsNullOrWhiteSpace(raw))
-                return "0";
-
-            raw = raw.Trim().TrimStart('0');
-            if (string.IsNullOrEmpty(raw))
-                raw = "0";
-
-            if (!long.TryParse(raw, out long val))
-                return raw;
-
-            return val.ToString("N0");
-        }
-
 
         private void LoadStockNameDictionary()
         {
