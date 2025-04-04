@@ -26,9 +26,11 @@ namespace trading_bot_prototype
             return raw.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        public Dictionary<string, string> GetStockCodeNameMap()
+        /// <summary>
+        /// 주어진 딕셔너리에 종목명-코드 매핑 정보를 채워넣는다.
+        /// </summary>
+        public void PopulateStockCodeNameMap(Dictionary<string, string> map)
         {
-            var result = new Dictionary<string, string>();
             foreach (var market in new[] { "0", "10" }) // 코스피 + 코스닥
             {
                 var codes = _api.GetCodeListByMarket(market).Split(';');
@@ -36,11 +38,10 @@ namespace trading_bot_prototype
                 {
                     if (string.IsNullOrWhiteSpace(code)) continue;
                     var name = _api.GetMasterCodeName(code).Trim();
-                    if (!result.ContainsKey(name))
-                        result[name] = code;
+                    if (!map.ContainsKey(name))
+                        map[name] = code;
                 }
             }
-            return result;
         }
 
         public int RequestBalance(string account, string password)
