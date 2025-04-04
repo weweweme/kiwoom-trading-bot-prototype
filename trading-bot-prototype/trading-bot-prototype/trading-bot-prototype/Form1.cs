@@ -177,6 +177,16 @@ namespace trading_bot_prototype
 
                 lstStockCandidates.Items.AddRange(filtered.ToArray());
             };
+
+            lstStockCandidates.SelectedIndexChanged += (s, e) =>
+            {
+                if (lstStockCandidates.SelectedItem == null) return;
+
+                string selected = lstStockCandidates.SelectedItem.ToString();
+                // "삼성전자우 (005935)" → "005935" 추출
+                string code = selected.Split('(', ')')[1];
+                txtStockCode.Text = code;
+            };
         }
 
         private void WriteLog(string message)
