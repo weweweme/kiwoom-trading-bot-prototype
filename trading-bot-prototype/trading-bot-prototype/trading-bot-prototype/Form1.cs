@@ -122,6 +122,25 @@ namespace trading_bot_prototype
                     lblBalance.Text = $"예수금: {formattedCash}원";
                 }
             };
+
+            btnRequestStockInfo.Click += (s, e) =>
+            {
+                string code = txtStockCode.Text.Trim();
+
+                if (string.IsNullOrWhiteSpace(code))
+                {
+                    WriteLog("종목코드를 입력하세요.");
+                    return;
+                }
+
+                axKHOpenAPI1.SetInputValue("종목코드", code);
+                int result = axKHOpenAPI1.CommRqData("종목정보요청", "opt10001", 0, "9100");
+
+                if (result == 0)
+                    WriteLog($"종목 [{code}] 정보 조회 요청 성공");
+                else
+                    WriteLog($"종목 [{code}] 정보 조회 요청 실패");
+            };
         }
 
         private void WriteLog(string message)
