@@ -7,16 +7,20 @@ namespace trading_bot_prototype
 {
     public partial class Form1 : Form
     {
-        private readonly Dictionary<string, string> nameToCode = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> nameToCode;
         private readonly Logger _logger;
         private readonly PriceFormatter _formatter;
+        private readonly KiwoomApiWrapper _api;
+
 
         public Form1()
         {
             InitializeComponent();
-            this.Load += new EventHandler(this.Form1_Load);
             _logger = new Logger(rtxtLog);
             _formatter = new PriceFormatter();
+            _api = new KiwoomApiWrapper(axKHOpenAPI1);
+            this.Load += new EventHandler(this.Form1_Load);
+            nameToCode = _api.GetStockCodeNameMap();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -34,11 +38,10 @@ namespace trading_bot_prototype
                     _logger.Log("로그인 성공");
 
                     // 로그인 정보 가져오기
-                    string userId = axKHOpenAPI1.GetLoginInfo("USER_ID");
-                    string userName = axKHOpenAPI1.GetLoginInfo("USER_NAME");
-                    string accountListRaw = axKHOpenAPI1.GetLoginInfo("ACCNO"); // 계좌번호 목록
-                    string serverType = axKHOpenAPI1.GetLoginInfo("GetServerGubun"); // 0: 실서버, 1: 모의투자
-                    string[] accountList = accountListRaw.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    string userId = _api.GetUserId();
+                    string userName = _api.GetUserName();
+                    string serverType = _api.GetServerType();
+                    string[] accountList = _api.GetAccountList();
                     cmbAccounts.Items.Clear();
                     cmbAccounts.Items.AddRange(accountList);
                     if (cmbAccounts.Items.Count > 0)
@@ -193,25 +196,6 @@ namespace trading_bot_prototype
                 string code = selected.Split('(', ')')[1];
                 txtStockCode.Text = code;
             };
-        }
-
-        private void LoadStockNameDictionary()
-        {
-            nameToCode.Clear();
-
-            var kospi = axKHOpenAPI1.GetCodeListByMarket("0").Split(';');
-            var kosdaq = axKHOpenAPI1.GetCodeListByMarket("10").Split(';');
-
-            foreach (var code in kospi.Concat(kosdaq))
-            {
-                if (string.IsNullOrWhiteSpace(code)) continue;
-                string name = axKHOpenAPI1.GetMasterCodeName(code).Trim();
-
-                if (!nameToCode.ContainsKey(name))
-                    nameToCode[name] = code;
-            }
-
-            _logger.Log($"종목명 매핑 완료 - 총 {nameToCode.Count}건");
         }
     }
 }
