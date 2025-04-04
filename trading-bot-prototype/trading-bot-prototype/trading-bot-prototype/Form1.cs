@@ -8,11 +8,13 @@ namespace trading_bot_prototype
     public partial class Form1 : Form
     {
         private Dictionary<string, string> nameToCode = new Dictionary<string, string>();
+        private Logger _logger;
 
         public Form1()
         {
             InitializeComponent();
             this.Load += new EventHandler(this.Form1_Load);
+            _logger = new Logger(rtxtLog);
         }
 
         private void Form1_Load(object sender, EventArgs e)
