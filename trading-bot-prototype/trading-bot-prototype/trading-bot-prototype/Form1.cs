@@ -61,8 +61,6 @@ namespace trading_bot_prototype
                         _logger.Log($"- {acc}");
                     }
                     _logger.Log($"서버 종류: {(serverType == "1" ? "모의투자" : "실서버")}");
-
-                    LoadStockNameDictionary();
                 }
                 else
                 {
@@ -82,7 +80,7 @@ namespace trading_bot_prototype
             // 연결 확인 버튼 클릭 이벤트 핸들러
             btnCheckConnect.Click += (s, e) =>
             {
-                if (axKHOpenAPI1.GetConnectState() == 0)
+                if (_api.GetConnectState() == 0)
                     _logger.Log("Open API 연결되어 있지 않습니다.");
                 else
                     _logger.Log("Open API 연결 중입니다.");
