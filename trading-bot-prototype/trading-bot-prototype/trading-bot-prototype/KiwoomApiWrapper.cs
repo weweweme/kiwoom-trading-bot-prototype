@@ -60,5 +60,9 @@ namespace trading_bot_prototype
 
         public int CommConnect() => _api.CommConnect();
         public int GetConnectState() => _api.GetConnectState();
+        public string GetCommData(string trCode, string rqName, int index, string itemName)
+        {
+            return _api.GetCommData(trCode, rqName, index, itemName);
+        }
     }
 }
