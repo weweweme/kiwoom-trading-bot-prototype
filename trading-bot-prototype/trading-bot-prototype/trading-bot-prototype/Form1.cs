@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace trading_bot_prototype
 {
@@ -11,7 +11,7 @@ namespace trading_bot_prototype
         private readonly Logger _logger;
         private readonly PriceFormatter _formatter;
         private readonly KiwoomApiWrapper _api;
-
+        private readonly AccountService _account;
 
         public Form1()
         {
@@ -19,7 +19,21 @@ namespace trading_bot_prototype
             _logger = new Logger(rtxtLog);
             _formatter = new PriceFormatter();
             _api = new KiwoomApiWrapper(axKHOpenAPI1);
-            this.Load += new EventHandler(this.Form1_Load);
+
+            _account = new AccountService(
+                _api,
+                _logger,
+                _formatter,
+                new AccountUIContext
+                {
+                    CmbAccounts = cmbAccounts,
+                    LblUserId = lblUserId,
+                    LblUserName = lblUserName,
+                    LblServerType = lblServerType,
+                    LblBalance = lblBalance
+                });
+
+            this.Load += Form1_Load;
             nameToCode = _api.GetStockCodeNameMap();
         }
 
@@ -30,37 +44,13 @@ namespace trading_bot_prototype
 
         private void InitializeEvents()
         {
-            // KHOpenAPI Control의 로그인 이벤트 핸들러
+            // 로그인 완료 이벤트
             axKHOpenAPI1.OnEventConnect += (s, e) =>
             {
                 if (e.nErrCode == 0)
                 {
                     _logger.Log("로그인 성공");
-
-                    // 로그인 정보 가져오기
-                    string userId = _api.GetUserId();
-                    string userName = _api.GetUserName();
-                    string serverType = _api.GetServerType();
-                    string[] accountList = _api.GetAccountList();
-                    cmbAccounts.Items.Clear();
-                    cmbAccounts.Items.AddRange(accountList);
-                    if (cmbAccounts.Items.Count > 0)
-                        cmbAccounts.SelectedIndex = 0;
-
-                    // Label에 실제 값 세팅
-                    lblUserId.Text = $"ID: {userId}";
-                    lblUserName.Text = $"이름: {userName}";
-                    lblServerType.Text = $"서버: {(serverType == "1" ? "모의투자" : "실서버")}";
-
-                    // 출력
-                    _logger.Log($"사용자 ID: {userId}");
-                    _logger.Log($"사용자 이름: {userName}");
-                    _logger.Log("계좌 목록:");
-                    foreach (string acc in accountList)
-                    {
-                        _logger.Log($"- {acc}");
-                    }
-                    _logger.Log($"서버 종류: {(serverType == "1" ? "모의투자" : "실서버")}");
+                    _account.HandleLoginSuccess();
                 }
                 else
                 {
@@ -68,63 +58,13 @@ namespace trading_bot_prototype
                 }
             };
 
-            // 로그인 버튼 클릭 이벤트 핸들러
-            btnLogin.Click += (s, e) =>
-            {
-                if (axKHOpenAPI1.CommConnect() == 0)
-                    _logger.Log("로그인창 열기 성공");
-                else
-                    _logger.Log("로그인창 열기 실패");
-            };
-
-            // 연결 확인 버튼 클릭 이벤트 핸들러
-            btnCheckConnect.Click += (s, e) =>
-            {
-                if (_api.GetConnectState() == 0)
-                    _logger.Log("Open API 연결되어 있지 않습니다.");
-                else
-                    _logger.Log("Open API 연결 중입니다.");
-            };
-
-            btnCheckBalance.Click += (s, e) =>
-            {
-                if (cmbAccounts.SelectedItem == null)
-                {
-                    _logger.Log("계좌를 선택하세요.");
-                    return;
-                }
-
-                string account = cmbAccounts.SelectedItem.ToString();
-                string password = txtPassword.Text.Trim();
-
-                if (string.IsNullOrWhiteSpace(password))
-                {
-                    _logger.Log("비밀번호를 입력하세요.");
-                    return;
-                }
-
-                axKHOpenAPI1.SetInputValue("계좌번호", account);
-                axKHOpenAPI1.SetInputValue("비밀번호", password); // <- 여기!
-                axKHOpenAPI1.SetInputValue("비밀번호입력매체구분", "00"); // PC
-                axKHOpenAPI1.SetInputValue("조회구분", "1"); // 합산
-
-                int result = _api.RequestBalance(account, password);
-
-                if (result == 0)
-                    _logger.Log("예수금 조회 요청 성공");
-                else
-                    _logger.Log("예수금 조회 요청 실패");
-            };
-
+            // 예수금 조회 응답 이벤트
             axKHOpenAPI1.OnReceiveTrData += (s, e) =>
             {
                 if (e.sRQName == "예수금요청")
                 {
                     string cashRaw = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "예수금");
-                    string cashFormatted = _formatter.Format(cashRaw);
-
-                    _logger.Log($"현재 매수 가능 예수금: {cashFormatted}원");
-                    lblBalance.Text = $"예수금: {cashFormatted}원";
+                    _account.HandleBalanceResult(cashRaw);
                 }
 
                 if (e.sRQName == "종목정보요청")
@@ -150,6 +90,36 @@ namespace trading_bot_prototype
                 }
             };
 
+            btnLogin.Click += (s, e) =>
+            {
+                if (_api.CommConnect() == 0)
+                    _logger.Log("로그인창 열기 성공");
+                else
+                    _logger.Log("로그인창 열기 실패");
+            };
+
+            btnCheckConnect.Click += (s, e) => _account.CheckConnectionStatus();
+
+            btnCheckBalance.Click += (s, e) =>
+            {
+                if (cmbAccounts.SelectedItem == null)
+                {
+                    _logger.Log("계좌를 선택하세요.");
+                    return;
+                }
+
+                string account = cmbAccounts.SelectedItem.ToString();
+                string password = txtPassword.Text.Trim();
+
+                if (string.IsNullOrWhiteSpace(password))
+                {
+                    _logger.Log("비밀번호를 입력하세요.");
+                    return;
+                }
+
+                _account.RequestBalance(account, password);
+            };
+
             btnRequestStockInfo.Click += (s, e) =>
             {
                 string code = txtStockCode.Text.Trim();
@@ -160,7 +130,6 @@ namespace trading_bot_prototype
                     return;
                 }
 
-                axKHOpenAPI1.SetInputValue("종목코드", code);
                 int result = _api.RequestStockInfo(code);
 
                 if (result == 0)
@@ -190,7 +159,6 @@ namespace trading_bot_prototype
                 if (lstStockCandidates.SelectedItem == null) return;
 
                 string selected = lstStockCandidates.SelectedItem.ToString();
-                // "삼성전자우 (005935)" → "005935" 추출
                 string code = selected.Split('(', ')')[1];
                 txtStockCode.Text = code;
             };
