@@ -7,14 +7,20 @@ namespace trading_bot_prototype
 {
     public partial class Form1 : Form
     {
-        private Dictionary<string, string> nameToCode = new Dictionary<string, string>();
-        private Logger _logger;
+        private readonly Dictionary<string, string> nameToCode;
+        private readonly Logger _logger;
+        private readonly PriceFormatter _formatter;
+        private readonly KiwoomApiWrapper _api;
+
 
         public Form1()
         {
             InitializeComponent();
-            this.Load += new EventHandler(this.Form1_Load);
             _logger = new Logger(rtxtLog);
+            _formatter = new PriceFormatter();
+            _api = new KiwoomApiWrapper(axKHOpenAPI1);
+            this.Load += new EventHandler(this.Form1_Load);
+            nameToCode = _api.GetStockCodeNameMap();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -32,11 +38,10 @@ namespace trading_bot_prototype
                     _logger.Log("로그인 성공");
 
                     // 로그인 정보 가져오기
-                    string userId = axKHOpenAPI1.GetLoginInfo("USER_ID");
-                    string userName = axKHOpenAPI1.GetLoginInfo("USER_NAME");
-                    string accountListRaw = axKHOpenAPI1.GetLoginInfo("ACCNO"); // 계좌번호 목록
-                    string serverType = axKHOpenAPI1.GetLoginInfo("GetServerGubun"); // 0: 실서버, 1: 모의투자
-                    string[] accountList = accountListRaw.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    string userId = _api.GetUserId();
+                    string userName = _api.GetUserName();
+                    string serverType = _api.GetServerType();
+                    string[] accountList = _api.GetAccountList();
                     cmbAccounts.Items.Clear();
                     cmbAccounts.Items.AddRange(accountList);
                     if (cmbAccounts.Items.Count > 0)
@@ -56,8 +61,6 @@ namespace trading_bot_prototype
                         _logger.Log($"- {acc}");
                     }
                     _logger.Log($"서버 종류: {(serverType == "1" ? "모의투자" : "실서버")}");
-
-                    LoadStockNameDictionary();
                 }
                 else
                 {
@@ -77,7 +80,7 @@ namespace trading_bot_prototype
             // 연결 확인 버튼 클릭 이벤트 핸들러
             btnCheckConnect.Click += (s, e) =>
             {
-                if (axKHOpenAPI1.GetConnectState() == 0)
+                if (_api.GetConnectState() == 0)
                     _logger.Log("Open API 연결되어 있지 않습니다.");
                 else
                     _logger.Log("Open API 연결 중입니다.");
@@ -105,7 +108,7 @@ namespace trading_bot_prototype
                 axKHOpenAPI1.SetInputValue("비밀번호입력매체구분", "00"); // PC
                 axKHOpenAPI1.SetInputValue("조회구분", "1"); // 합산
 
-                int result = axKHOpenAPI1.CommRqData("예수금요청", "opw00001", 0, "9000");
+                int result = _api.RequestBalance(account, password);
 
                 if (result == 0)
                     _logger.Log("예수금 조회 요청 성공");
@@ -118,7 +121,7 @@ namespace trading_bot_prototype
                 if (e.sRQName == "예수금요청")
                 {
                     string cashRaw = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "예수금");
-                    string cashFormatted = FormatPrice(cashRaw);
+                    string cashFormatted = _formatter.Format(cashRaw);
 
                     _logger.Log($"현재 매수 가능 예수금: {cashFormatted}원");
                     lblBalance.Text = $"예수금: {cashFormatted}원";
@@ -138,11 +141,11 @@ namespace trading_bot_prototype
                     _logger.Log($"[종목 정보]");
                     _logger.Log($"코드: {code}");
                     _logger.Log($"이름: {name}");
-                    _logger.Log($"시가: {FormatPrice(open)}");
-                    _logger.Log($"고가: {FormatPrice(high)}");
-                    _logger.Log($"저가: {FormatPrice(low)}");
-                    _logger.Log($"상한가: {FormatPrice(upper)}");
-                    _logger.Log($"기준가: {FormatPrice(basePrice)}");
+                    _logger.Log($"시가: {_formatter.Format(open)}");
+                    _logger.Log($"고가: {_formatter.Format(high)}");
+                    _logger.Log($"저가: {_formatter.Format(low)}");
+                    _logger.Log($"상한가: {_formatter.Format(upper)}");
+                    _logger.Log($"기준가: {_formatter.Format(basePrice)}");
                     _logger.Log($"유통비율: {floatRate}");
                 }
             };
@@ -158,7 +161,7 @@ namespace trading_bot_prototype
                 }
 
                 axKHOpenAPI1.SetInputValue("종목코드", code);
-                int result = axKHOpenAPI1.CommRqData("종목정보요청", "opt10001", 0, "9100");
+                int result = _api.RequestStockInfo(code);
 
                 if (result == 0)
                     _logger.Log($"종목 [{code}] 정보 조회 요청 성공");
@@ -191,41 +194,6 @@ namespace trading_bot_prototype
                 string code = selected.Split('(', ')')[1];
                 txtStockCode.Text = code;
             };
-        }
-
-        private string FormatPrice(string raw)
-        {
-            if (string.IsNullOrWhiteSpace(raw))
-                return "0";
-
-            raw = raw.Trim().TrimStart('0');
-            if (string.IsNullOrEmpty(raw))
-                raw = "0";
-
-            if (!long.TryParse(raw, out long val))
-                return raw;
-
-            return val.ToString("N0");
-        }
-
-
-        private void LoadStockNameDictionary()
-        {
-            nameToCode.Clear();
-
-            var kospi = axKHOpenAPI1.GetCodeListByMarket("0").Split(';');
-            var kosdaq = axKHOpenAPI1.GetCodeListByMarket("10").Split(';');
-
-            foreach (var code in kospi.Concat(kosdaq))
-            {
-                if (string.IsNullOrWhiteSpace(code)) continue;
-                string name = axKHOpenAPI1.GetMasterCodeName(code).Trim();
-
-                if (!nameToCode.ContainsKey(name))
-                    nameToCode[name] = code;
-            }
-
-            _logger.Log($"종목명 매핑 완료 - 총 {nameToCode.Count}건");
         }
     }
 }
