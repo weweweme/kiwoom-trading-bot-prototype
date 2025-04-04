@@ -110,16 +110,10 @@ namespace trading_bot_prototype
                 if (e.sRQName == "예수금요청")
                 {
                     string cashRaw = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "예수금");
-                    string cashTrimmed = cashRaw.Trim().TrimStart('0');
+                    string cashFormatted = FormatPrice(cashRaw);
 
-                    if (string.IsNullOrEmpty(cashTrimmed))
-                        cashTrimmed = "0";
-
-                    long cash = long.Parse(cashTrimmed);
-                    string formattedCash = cash.ToString("N0"); // "10,000,000"
-
-                    WriteLog($"현재 매수 가능 예수금: {formattedCash}원");
-                    lblBalance.Text = $"예수금: {formattedCash}원";
+                    WriteLog($"현재 매수 가능 예수금: {cashFormatted}원");
+                    lblBalance.Text = $"예수금: {cashFormatted}원";
                 }
 
                 if (e.sRQName == "종목정보요청")
@@ -174,8 +168,16 @@ namespace trading_bot_prototype
 
         private string FormatPrice(string raw)
         {
-            if (string.IsNullOrWhiteSpace(raw)) return "0";
-            if (!long.TryParse(raw, out long val)) return raw;
+            if (string.IsNullOrWhiteSpace(raw))
+                return "0";
+
+            raw = raw.Trim().TrimStart('0');
+            if (string.IsNullOrEmpty(raw))
+                raw = "0";
+
+            if (!long.TryParse(raw, out long val))
+                return raw;
+
             return val.ToString("N0");
         }
     }
