@@ -43,6 +43,8 @@ namespace trading_bot_prototype
             this.btnCheckBalance = new System.Windows.Forms.Button();
             this.lblBalance = new System.Windows.Forms.Label();
             this.txtPassword = new System.Windows.Forms.TextBox();
+            this.txtStockCode = new System.Windows.Forms.TextBox();
+            this.btnRequestStockInfo = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.axKHOpenAPI1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -163,11 +165,29 @@ namespace trading_bot_prototype
             this.txtPassword.TabIndex = 12;
             this.txtPassword.UseSystemPasswordChar = true;
             // 
+            // txtStockCode
+            // 
+            this.txtStockCode.Location = new System.Drawing.Point(22, 186);
+            this.txtStockCode.Name = "txtStockCode";
+            this.txtStockCode.Size = new System.Drawing.Size(100, 21);
+            this.txtStockCode.TabIndex = 13;
+            // 
+            // btnRequestStockInfo
+            // 
+            this.btnRequestStockInfo.Location = new System.Drawing.Point(128, 186);
+            this.btnRequestStockInfo.Name = "btnRequestStockInfo";
+            this.btnRequestStockInfo.Size = new System.Drawing.Size(121, 23);
+            this.btnRequestStockInfo.TabIndex = 14;
+            this.btnRequestStockInfo.Text = "종목 조회";
+            this.btnRequestStockInfo.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnRequestStockInfo);
+            this.Controls.Add(this.txtStockCode);
             this.Controls.Add(this.txtPassword);
             this.Controls.Add(this.lblBalance);
             this.Controls.Add(this.btnCheckBalance);
@@ -204,6 +224,8 @@ namespace trading_bot_prototype
         private System.Windows.Forms.Button btnCheckBalance;
         private System.Windows.Forms.Label lblBalance;
         private System.Windows.Forms.TextBox txtPassword;
+        private System.Windows.Forms.TextBox txtStockCode;
+        private System.Windows.Forms.Button btnRequestStockInfo;
     }
 }
 

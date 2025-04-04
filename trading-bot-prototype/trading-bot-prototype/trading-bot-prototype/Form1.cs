@@ -110,17 +110,52 @@ namespace trading_bot_prototype
                 if (e.sRQName == "예수금요청")
                 {
                     string cashRaw = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "예수금");
-                    string cashTrimmed = cashRaw.Trim().TrimStart('0');
+                    string cashFormatted = FormatPrice(cashRaw);
 
-                    if (string.IsNullOrEmpty(cashTrimmed))
-                        cashTrimmed = "0";
-
-                    long cash = long.Parse(cashTrimmed);
-                    string formattedCash = cash.ToString("N0"); // "10,000,000"
-
-                    WriteLog($"현재 매수 가능 예수금: {formattedCash}원");
-                    lblBalance.Text = $"예수금: {formattedCash}원";
+                    WriteLog($"현재 매수 가능 예수금: {cashFormatted}원");
+                    lblBalance.Text = $"예수금: {cashFormatted}원";
                 }
+
+                if (e.sRQName == "종목정보요청")
+                {
+                    string code = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "종목코드").Trim();
+                    string name = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "종목명").Trim();
+                    string open = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "시가").TrimStart('0');
+                    string high = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "고가").TrimStart('0');
+                    string low = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "저가").TrimStart('0');
+                    string upper = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "상한가").TrimStart('0');
+                    string basePrice = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "기준가").TrimStart('0');
+                    string floatRate = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "유통비율").Trim();
+
+                    WriteLog($"[종목 정보]");
+                    WriteLog($"코드: {code}");
+                    WriteLog($"이름: {name}");
+                    WriteLog($"시가: {FormatPrice(open)}");
+                    WriteLog($"고가: {FormatPrice(high)}");
+                    WriteLog($"저가: {FormatPrice(low)}");
+                    WriteLog($"상한가: {FormatPrice(upper)}");
+                    WriteLog($"기준가: {FormatPrice(basePrice)}");
+                    WriteLog($"유통비율: {floatRate}");
+                }
+            };
+
+            btnRequestStockInfo.Click += (s, e) =>
+            {
+                string code = txtStockCode.Text.Trim();
+
+                if (string.IsNullOrWhiteSpace(code))
+                {
+                    WriteLog("종목코드를 입력하세요.");
+                    return;
+                }
+
+                axKHOpenAPI1.SetInputValue("종목코드", code);
+                int result = axKHOpenAPI1.CommRqData("종목정보요청", "opt10001", 0, "9100");
+
+                if (result == 0)
+                    WriteLog($"종목 [{code}] 정보 조회 요청 성공");
+                else
+                    WriteLog($"종목 [{code}] 정보 조회 요청 실패");
             };
         }
 
@@ -129,6 +164,21 @@ namespace trading_bot_prototype
             rtxtLog.AppendText($"{DateTime.Now:HH:mm:ss} - {message}\n");
             rtxtLog.SelectionStart = rtxtLog.Text.Length;
             rtxtLog.ScrollToCaret();
+        }
+
+        private string FormatPrice(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+                return "0";
+
+            raw = raw.Trim().TrimStart('0');
+            if (string.IsNullOrEmpty(raw))
+                raw = "0";
+
+            if (!long.TryParse(raw, out long val))
+                return raw;
+
+            return val.ToString("N0");
         }
     }
 }
