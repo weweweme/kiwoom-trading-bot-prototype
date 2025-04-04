@@ -12,6 +12,7 @@ namespace trading_bot_prototype
         private readonly PriceFormatter _formatter;
         private readonly KiwoomApiWrapper _api;
         private readonly AccountService _account;
+        private readonly StockService _stock;
 
         public Form1()
         {
@@ -33,8 +34,21 @@ namespace trading_bot_prototype
                     LblBalance = lblBalance
                 });
 
-            this.Load += Form1_Load;
             nameToCode = _api.GetStockCodeNameMap();
+
+            _stock = new StockService(
+                _api,
+                _logger,
+                _formatter,
+                new StockUIContext
+                {
+                    TxtStockName = txtStockName,
+                    TxtStockCode = txtStockCode,
+                    LstStockCandidates = lstStockCandidates
+                },
+                nameToCode);
+
+            this.Load += Form1_Load;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -58,38 +72,22 @@ namespace trading_bot_prototype
                 }
             };
 
-            // 예수금 조회 응답 이벤트
+            // 데이터 수신 이벤트 (예수금, 종목정보)
             axKHOpenAPI1.OnReceiveTrData += (s, e) =>
             {
                 if (e.sRQName == "예수금요청")
                 {
-                    string cashRaw = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "예수금");
+                    string cashRaw = _api.GetCommData(e.sTrCode, e.sRQName, 0, "예수금");
                     _account.HandleBalanceResult(cashRaw);
                 }
 
                 if (e.sRQName == "종목정보요청")
                 {
-                    string code = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "종목코드").Trim();
-                    string name = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "종목명").Trim();
-                    string open = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "시가").TrimStart('0');
-                    string high = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "고가").TrimStart('0');
-                    string low = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "저가").TrimStart('0');
-                    string upper = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "상한가").TrimStart('0');
-                    string basePrice = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "기준가").TrimStart('0');
-                    string floatRate = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "유통비율").Trim();
-
-                    _logger.Log($"[종목 정보]");
-                    _logger.Log($"코드: {code}");
-                    _logger.Log($"이름: {name}");
-                    _logger.Log($"시가: {_formatter.Format(open)}");
-                    _logger.Log($"고가: {_formatter.Format(high)}");
-                    _logger.Log($"저가: {_formatter.Format(low)}");
-                    _logger.Log($"상한가: {_formatter.Format(upper)}");
-                    _logger.Log($"기준가: {_formatter.Format(basePrice)}");
-                    _logger.Log($"유통비율: {floatRate}");
+                    _stock.HandleStockInfoResult(e);
                 }
             };
 
+            // 버튼 클릭 이벤트
             btnLogin.Click += (s, e) =>
             {
                 if (_api.CommConnect() == 0)
@@ -120,48 +118,11 @@ namespace trading_bot_prototype
                 _account.RequestBalance(account, password);
             };
 
-            btnRequestStockInfo.Click += (s, e) =>
-            {
-                string code = txtStockCode.Text.Trim();
+            btnRequestStockInfo.Click += (s, e) => _stock.RequestStockInfo();
 
-                if (string.IsNullOrWhiteSpace(code))
-                {
-                    _logger.Log("종목코드를 입력하세요.");
-                    return;
-                }
+            txtStockName.TextChanged += (s, e) => _stock.OnStockNameChanged();
 
-                int result = _api.RequestStockInfo(code);
-
-                if (result == 0)
-                    _logger.Log($"종목 [{code}] 정보 조회 요청 성공");
-                else
-                    _logger.Log($"종목 [{code}] 정보 조회 요청 실패");
-            };
-
-            txtStockName.TextChanged += (s, e) =>
-            {
-                string keyword = txtStockName.Text.Trim();
-                lstStockCandidates.Items.Clear();
-
-                if (keyword.Length < 1) return;
-
-                var filtered = nameToCode
-                    .Where(kv => kv.Key.Contains(keyword))
-                    .OrderBy(kv => kv.Key)
-                    .Select(kv => $"{kv.Key} ({kv.Value})")
-                    .ToList();
-
-                lstStockCandidates.Items.AddRange(filtered.ToArray());
-            };
-
-            lstStockCandidates.SelectedIndexChanged += (s, e) =>
-            {
-                if (lstStockCandidates.SelectedItem == null) return;
-
-                string selected = lstStockCandidates.SelectedItem.ToString();
-                string code = selected.Split('(', ')')[1];
-                txtStockCode.Text = code;
-            };
+            lstStockCandidates.SelectedIndexChanged += (s, e) => _stock.OnStockCandidateSelected();
         }
     }
 }
