@@ -161,7 +161,7 @@ namespace trading_bot_prototype
                 }
 
                 axKHOpenAPI1.SetInputValue("종목코드", code);
-                int result = axKHOpenAPI1.CommRqData("종목정보요청", "opt10001", 0, "9100");
+                int result = _api.RequestStockInfo(code);
 
                 if (result == 0)
                     _logger.Log($"종목 [{code}] 정보 조회 요청 성공");
