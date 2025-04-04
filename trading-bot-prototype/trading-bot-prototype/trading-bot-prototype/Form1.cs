@@ -161,6 +161,22 @@ namespace trading_bot_prototype
                 else
                     WriteLog($"종목 [{code}] 정보 조회 요청 실패");
             };
+
+            txtStockName.TextChanged += (s, e) =>
+            {
+                string keyword = txtStockName.Text.Trim();
+                lstStockCandidates.Items.Clear();
+
+                if (keyword.Length < 1) return;
+
+                var filtered = nameToCode
+                    .Where(kv => kv.Key.Contains(keyword))
+                    .OrderBy(kv => kv.Key)
+                    .Select(kv => $"{kv.Key} ({kv.Value})")
+                    .ToList();
+
+                lstStockCandidates.Items.AddRange(filtered.ToArray());
+            };
         }
 
         private void WriteLog(string message)
