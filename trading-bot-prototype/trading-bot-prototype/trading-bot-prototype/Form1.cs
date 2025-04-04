@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace trading_bot_prototype
 {
     public partial class Form1 : Form
     {
+        private Dictionary<string, string> nameToCode = new Dictionary<string, string>();
+
         public Form1()
         {
             InitializeComponent();
@@ -50,6 +54,8 @@ namespace trading_bot_prototype
                         WriteLog($"- {acc}");
                     }
                     WriteLog($"서버 종류: {(serverType == "1" ? "모의투자" : "실서버")}");
+
+                    LoadStockNameDictionary();
                 }
                 else
                 {
@@ -157,6 +163,32 @@ namespace trading_bot_prototype
                 else
                     WriteLog($"종목 [{code}] 정보 조회 요청 실패");
             };
+
+            txtStockName.TextChanged += (s, e) =>
+            {
+                string keyword = txtStockName.Text.Trim();
+                lstStockCandidates.Items.Clear();
+
+                if (keyword.Length < 1) return;
+
+                var filtered = nameToCode
+                    .Where(kv => kv.Key.Contains(keyword))
+                    .OrderBy(kv => kv.Key)
+                    .Select(kv => $"{kv.Key} ({kv.Value})")
+                    .ToList();
+
+                lstStockCandidates.Items.AddRange(filtered.ToArray());
+            };
+
+            lstStockCandidates.SelectedIndexChanged += (s, e) =>
+            {
+                if (lstStockCandidates.SelectedItem == null) return;
+
+                string selected = lstStockCandidates.SelectedItem.ToString();
+                // "삼성전자우 (005935)" → "005935" 추출
+                string code = selected.Split('(', ')')[1];
+                txtStockCode.Text = code;
+            };
         }
 
         private void WriteLog(string message)
@@ -179,6 +211,26 @@ namespace trading_bot_prototype
                 return raw;
 
             return val.ToString("N0");
+        }
+
+
+        private void LoadStockNameDictionary()
+        {
+            nameToCode.Clear();
+
+            var kospi = axKHOpenAPI1.GetCodeListByMarket("0").Split(';');
+            var kosdaq = axKHOpenAPI1.GetCodeListByMarket("10").Split(';');
+
+            foreach (var code in kospi.Concat(kosdaq))
+            {
+                if (string.IsNullOrWhiteSpace(code)) continue;
+                string name = axKHOpenAPI1.GetMasterCodeName(code).Trim();
+
+                if (!nameToCode.ContainsKey(name))
+                    nameToCode[name] = code;
+            }
+
+            WriteLog($"종목명 매핑 완료 - 총 {nameToCode.Count}건");
         }
     }
 }

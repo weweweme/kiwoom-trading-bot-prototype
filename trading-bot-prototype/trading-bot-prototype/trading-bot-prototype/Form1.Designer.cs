@@ -45,6 +45,8 @@ namespace trading_bot_prototype
             this.txtPassword = new System.Windows.Forms.TextBox();
             this.txtStockCode = new System.Windows.Forms.TextBox();
             this.btnRequestStockInfo = new System.Windows.Forms.Button();
+            this.txtStockName = new System.Windows.Forms.TextBox();
+            this.lstStockCandidates = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.axKHOpenAPI1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -181,11 +183,29 @@ namespace trading_bot_prototype
             this.btnRequestStockInfo.Text = "종목 조회";
             this.btnRequestStockInfo.UseVisualStyleBackColor = true;
             // 
+            // txtStockName
+            // 
+            this.txtStockName.Location = new System.Drawing.Point(22, 222);
+            this.txtStockName.Name = "txtStockName";
+            this.txtStockName.Size = new System.Drawing.Size(100, 21);
+            this.txtStockName.TabIndex = 15;
+            // 
+            // lstStockCandidates
+            // 
+            this.lstStockCandidates.FormattingEnabled = true;
+            this.lstStockCandidates.ItemHeight = 12;
+            this.lstStockCandidates.Location = new System.Drawing.Point(129, 222);
+            this.lstStockCandidates.Name = "lstStockCandidates";
+            this.lstStockCandidates.Size = new System.Drawing.Size(120, 88);
+            this.lstStockCandidates.TabIndex = 16;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.lstStockCandidates);
+            this.Controls.Add(this.txtStockName);
             this.Controls.Add(this.btnRequestStockInfo);
             this.Controls.Add(this.txtStockCode);
             this.Controls.Add(this.txtPassword);
@@ -226,6 +246,8 @@ namespace trading_bot_prototype
         private System.Windows.Forms.TextBox txtPassword;
         private System.Windows.Forms.TextBox txtStockCode;
         private System.Windows.Forms.Button btnRequestStockInfo;
+        private System.Windows.Forms.TextBox txtStockName;
+        private System.Windows.Forms.ListBox lstStockCandidates;
     }
 }
 
