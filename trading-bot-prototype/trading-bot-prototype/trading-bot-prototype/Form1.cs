@@ -29,7 +29,7 @@ namespace trading_bot_prototype
             {
                 if (e.nErrCode == 0)
                 {
-                    WriteLog("로그인 성공");
+                    _logger.Log("로그인 성공");
 
                     // 로그인 정보 가져오기
                     string userId = axKHOpenAPI1.GetLoginInfo("USER_ID");
@@ -48,20 +48,20 @@ namespace trading_bot_prototype
                     lblServerType.Text = $"서버: {(serverType == "1" ? "모의투자" : "실서버")}";
 
                     // 출력
-                    WriteLog($"사용자 ID: {userId}");
-                    WriteLog($"사용자 이름: {userName}");
-                    WriteLog("계좌 목록:");
+                    _logger.Log($"사용자 ID: {userId}");
+                    _logger.Log($"사용자 이름: {userName}");
+                    _logger.Log("계좌 목록:");
                     foreach (string acc in accountList)
                     {
-                        WriteLog($"- {acc}");
+                        _logger.Log($"- {acc}");
                     }
-                    WriteLog($"서버 종류: {(serverType == "1" ? "모의투자" : "실서버")}");
+                    _logger.Log($"서버 종류: {(serverType == "1" ? "모의투자" : "실서버")}");
 
                     LoadStockNameDictionary();
                 }
                 else
                 {
-                    WriteLog($"로그인 실패 - 에러코드: {e.nErrCode}");
+                    _logger.Log($"로그인 실패 - 에러코드: {e.nErrCode}");
                 }
             };
 
@@ -69,25 +69,25 @@ namespace trading_bot_prototype
             btnLogin.Click += (s, e) =>
             {
                 if (axKHOpenAPI1.CommConnect() == 0)
-                    WriteLog("로그인창 열기 성공");
+                    _logger.Log("로그인창 열기 성공");
                 else
-                    WriteLog("로그인창 열기 실패");
+                    _logger.Log("로그인창 열기 실패");
             };
 
             // 연결 확인 버튼 클릭 이벤트 핸들러
             btnCheckConnect.Click += (s, e) =>
             {
                 if (axKHOpenAPI1.GetConnectState() == 0)
-                    WriteLog("Open API 연결되어 있지 않습니다.");
+                    _logger.Log("Open API 연결되어 있지 않습니다.");
                 else
-                    WriteLog("Open API 연결 중입니다.");
+                    _logger.Log("Open API 연결 중입니다.");
             };
 
             btnCheckBalance.Click += (s, e) =>
             {
                 if (cmbAccounts.SelectedItem == null)
                 {
-                    WriteLog("계좌를 선택하세요.");
+                    _logger.Log("계좌를 선택하세요.");
                     return;
                 }
 
@@ -96,7 +96,7 @@ namespace trading_bot_prototype
 
                 if (string.IsNullOrWhiteSpace(password))
                 {
-                    WriteLog("비밀번호를 입력하세요.");
+                    _logger.Log("비밀번호를 입력하세요.");
                     return;
                 }
 
@@ -108,9 +108,9 @@ namespace trading_bot_prototype
                 int result = axKHOpenAPI1.CommRqData("예수금요청", "opw00001", 0, "9000");
 
                 if (result == 0)
-                    WriteLog("예수금 조회 요청 성공");
+                    _logger.Log("예수금 조회 요청 성공");
                 else
-                    WriteLog("예수금 조회 요청 실패");
+                    _logger.Log("예수금 조회 요청 실패");
             };
 
             axKHOpenAPI1.OnReceiveTrData += (s, e) =>
@@ -120,7 +120,7 @@ namespace trading_bot_prototype
                     string cashRaw = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "예수금");
                     string cashFormatted = FormatPrice(cashRaw);
 
-                    WriteLog($"현재 매수 가능 예수금: {cashFormatted}원");
+                    _logger.Log($"현재 매수 가능 예수금: {cashFormatted}원");
                     lblBalance.Text = $"예수금: {cashFormatted}원";
                 }
 
@@ -135,15 +135,15 @@ namespace trading_bot_prototype
                     string basePrice = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "기준가").TrimStart('0');
                     string floatRate = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "유통비율").Trim();
 
-                    WriteLog($"[종목 정보]");
-                    WriteLog($"코드: {code}");
-                    WriteLog($"이름: {name}");
-                    WriteLog($"시가: {FormatPrice(open)}");
-                    WriteLog($"고가: {FormatPrice(high)}");
-                    WriteLog($"저가: {FormatPrice(low)}");
-                    WriteLog($"상한가: {FormatPrice(upper)}");
-                    WriteLog($"기준가: {FormatPrice(basePrice)}");
-                    WriteLog($"유통비율: {floatRate}");
+                    _logger.Log($"[종목 정보]");
+                    _logger.Log($"코드: {code}");
+                    _logger.Log($"이름: {name}");
+                    _logger.Log($"시가: {FormatPrice(open)}");
+                    _logger.Log($"고가: {FormatPrice(high)}");
+                    _logger.Log($"저가: {FormatPrice(low)}");
+                    _logger.Log($"상한가: {FormatPrice(upper)}");
+                    _logger.Log($"기준가: {FormatPrice(basePrice)}");
+                    _logger.Log($"유통비율: {floatRate}");
                 }
             };
 
@@ -153,7 +153,7 @@ namespace trading_bot_prototype
 
                 if (string.IsNullOrWhiteSpace(code))
                 {
-                    WriteLog("종목코드를 입력하세요.");
+                    _logger.Log("종목코드를 입력하세요.");
                     return;
                 }
 
@@ -161,9 +161,9 @@ namespace trading_bot_prototype
                 int result = axKHOpenAPI1.CommRqData("종목정보요청", "opt10001", 0, "9100");
 
                 if (result == 0)
-                    WriteLog($"종목 [{code}] 정보 조회 요청 성공");
+                    _logger.Log($"종목 [{code}] 정보 조회 요청 성공");
                 else
-                    WriteLog($"종목 [{code}] 정보 조회 요청 실패");
+                    _logger.Log($"종목 [{code}] 정보 조회 요청 실패");
             };
 
             txtStockName.TextChanged += (s, e) =>
@@ -191,13 +191,6 @@ namespace trading_bot_prototype
                 string code = selected.Split('(', ')')[1];
                 txtStockCode.Text = code;
             };
-        }
-
-        private void WriteLog(string message)
-        {
-            rtxtLog.AppendText($"{DateTime.Now:HH:mm:ss} - {message}\n");
-            rtxtLog.SelectionStart = rtxtLog.Text.Length;
-            rtxtLog.ScrollToCaret();
         }
 
         private string FormatPrice(string raw)
@@ -232,7 +225,7 @@ namespace trading_bot_prototype
                     nameToCode[name] = code;
             }
 
-            WriteLog($"종목명 매핑 완료 - 총 {nameToCode.Count}건");
+            _logger.Log($"종목명 매핑 완료 - 총 {nameToCode.Count}건");
         }
     }
 }
